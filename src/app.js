@@ -6,8 +6,10 @@ const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const winston = require('winston');
 const bookmarkRouter = require('./bookmark/bookmark')
-
+const BookmarksService = require('./bookmark/bookmark-service.js')
 const app = express()
+const logger = require('./logger')
+const { API_TKEN } = require('./config')
 
 const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
@@ -35,6 +37,15 @@ app.use(morgan(morganOption))
 app.use(cors())
 app.use(helmet())
 app.use(bookmarkRouter)
+
+app.get('/bookmarks', (req, res, next) => {
+  const knexInstance = req.app.get('db')
+  BookmarksService.getAllBookmarks(knexInstance)
+  .then(bookmarks => {
+    res.json(bookmarks)
+  })
+  .catch(next)
+})
 
 app.get('/', (req, res) => {
 	res.send('Hello, world!')
