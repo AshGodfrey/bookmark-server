@@ -14,20 +14,7 @@ const morganOption = (NODE_ENV === 'production')
   : 'common';
 
 
-// set up winston
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.json(),
-  transports: [
-    new winston.transports.File({ filename: 'info.log' })
-  ]
-});
 
-if (NODE_ENV !== 'production') {
-  logger.add(new winston.transports.Console({
-    format: winston.format.simple()
-  }));
-}
 
 //validate bearer Token
 app.use(function validateBearerToken(req, res, next) {
