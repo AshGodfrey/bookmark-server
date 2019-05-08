@@ -47,6 +47,19 @@ app.get('/bookmarks', (req, res, next) => {
   .catch(next)
 })
 
+app.post('bookmarks', (req, res, next) => {
+  const { title, url, description, rating } = req.body
+  const newBookmark = { title, url, description, rating }
+  BookmarksService.insertBookmark(
+    req.app.get('db'),
+    newBookmark
+    )
+    .then(bookmark => {
+      res.status(201).json(bookmark)
+    })
+    .catch(next)
+})
+
 app.get('/bookmarks/:id', (req, res, next) => {
   const knexInstance = req.app.get('db')
   BookmarksService.getById(knexInstance, req.params.bookmark_id)
