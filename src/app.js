@@ -6,7 +6,6 @@ const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const winston = require('winston');
 const bookmarkRouter = require('./bookmark/bookmark')
-const BookmarksService = require('./bookmark/bookmark-service.js')
 const app = express()
 const logger = require('./logger')
 const { API_TKEN } = require('./config')
@@ -38,41 +37,6 @@ app.use(cors())
 app.use(helmet())
 app.use(bookmarkRouter)
 
-app.get('/bookmarks', (req, res, next) => {
-  const knexInstance = req.app.get('db')
-  BookmarksService.getAllBookmarks(knexInstance)
-  .then(bookmarks => {
-    res.json(bookmarks)
-  })
-  .catch(next)
-})
-
-app.post('bookmarks', (req, res, next) => {
-  const { title, url, description, rating } = req.body
-  const newBookmark = { title, url, description, rating }
-  BookmarksService.insertBookmark(
-    req.app.get('db'),
-    newBookmark
-    )
-    .then(bookmark => {
-      res.status(201).json(bookmark)
-    })
-    .catch(next)
-})
-
-app.get('/bookmarks/:id', (req, res, next) => {
-  const knexInstance = req.app.get('db')
-  BookmarksService.getById(knexInstance, req.params.bookmark_id)
-    .then(bookmark => {
-      if(!bookmark) {
-        return res.status(404).json({
-          error: {message: 'Bookmark doesnt exist'}
-        })
-      }
-      res.json(bookmark)
-    })
-    .catch(next)
-})
 
 app.get('/', (req, res) => {
 	res.send('Hello, world!')
