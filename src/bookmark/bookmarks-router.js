@@ -1,3 +1,4 @@
+const path = require('path')
 const express = require('express')
 const xss = require('xss')
 const BookmarksService = require('./bookmarks-service')
@@ -11,7 +12,7 @@ bookmarksRouter
 		BookmarksService.getAllBookmarks(
 			req.app.get('db')
 			)
-		.then(articles => {
+		.then(bookmarks => {
 			res.json(articles)
 		})
 		.catch(next)
@@ -32,7 +33,10 @@ bookmarksRouter
 	    newBookmark
 	    )
 	    .then(bookmark => {
-	      res.status(201).json(bookmark)
+	    	res
+	    		.status(201)
+	    		.location(path.posix.join(req.originalUrl, + `/${bookmark.id}`
+	      		.json(serializeBookmark(bookmark))
 	    })
 	    .catch(next)
 	})
@@ -66,6 +70,28 @@ bookmarksRouter
 				res.status(204).end()
 			})
 			.catch(next)
+	})
+	.patch(jsonParser, (req, res, next) => {
+		const { title, url, description, rating } = req.body
+	    const bookmarkToUpdate= { title, url, description, rating }
+
+	    const numberofValues = Object.values(articleToUpdate).filter(Boolean).length
+	    if (numberOfValues === 0) {
+	    	return res.status(400).json({
+	    		error: {
+	    			message: "request must have content!"
+	    		}
+	    	})
+	    }
+	    BookmarksService.updateBookmark(
+	    	req.app.get('db'),
+	    	req.params.bookmark_id,
+	    	bookmarkToUpdate
+	    	)
+	    .then(numRowsAffected => {
+	    	res.status(204).end()
+	    })
+	    .catch(next)
 	})
 
 

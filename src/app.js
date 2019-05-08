@@ -5,10 +5,11 @@ const cors = require('cors')
 const helmet = require('helmet')
 const { NODE_ENV } = require('./config')
 const winston = require('winston');
-const bookmarkRouter = require('./bookmark/bookmark')
+const bookmarksRouter = require('./bookmark/bookmarks-router')
 const app = express()
 const logger = require('./logger')
 const { API_TKEN } = require('./config')
+
 
 const morganOption = (NODE_ENV === 'production')
   ? 'tiny'
@@ -35,7 +36,7 @@ app.use(function validateBearerToken(req, res, next) {
 app.use(morgan(morganOption))
 app.use(cors())
 app.use(helmet())
-app.use(bookmarkRouter)
+app.use('/api/articles', bookmarksRouter)
 
 
 app.get('/', (req, res) => {
